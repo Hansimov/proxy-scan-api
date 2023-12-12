@@ -1,7 +1,8 @@
 import cssutils
+from pathlib import Path
 import re
+import requests
 from bs4 import BeautifulSoup
-from DrissionPage import WebPage, ChromiumOptions
 from pprint import pprint
 
 
@@ -9,9 +10,9 @@ class ProxyRowExtractor:
     def __init__(self):
         pass
 
-    def extract(self, table_html):
-        soup = BeautifulSoup(table_html, "html.parser")
-        rows = soup.find_all("tr")
+    def extract(self, html_str):
+        soup = BeautifulSoup(html_str, "html.parser")
+        rows = soup.find("table").find_all("tr")
         keys = [
             "ip",
             "port",
@@ -46,8 +47,10 @@ class ProxyRowExtractor:
                     row_dict["samples"] = samples
                 else:
                     row_dict[key] = cell_text
-            pprint(row_dict)
-            row_dicts.append(row_dict)
+            if row_dict:
+                pprint(row_dict)
+                row_dicts.append(row_dict)
+        # pprint(row_dicts)
 
 
 class ProxyScanner:
@@ -65,24 +68,30 @@ class ProxyScanner:
             f"{self.proxy_server_list_url_base}-{country}" for country in countries
         ]
 
-    def run(self):
+    def download_proxies_html(self, overwrite=False):
         proxy_url = self.proxy_server_list_urls[-1]
-        options = ChromiumOptions()
-        options.set_argument("--incognito")
-        options.set_argument(f"--proxy-server", self.scan_proxy)
-        self.options = options
-        page = WebPage(driver_or_options=self.options)
-        page.get(proxy_url)
-        print(page.title)
-        page.wait.ele_display("#tbl_proxy_list")
-        ele = page.ele("#tbl_proxy_list")
-        # print(ele.html)
-        extractor = ProxyRowExtractor()
-        extractor.extract(ele.html)
+        proxies_html_path = Path("proxies.html")
 
-        self.page = page
+        if not proxies_html_path.exists() or overwrite:
+            requests_headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
+            }
+            res = requests.get(proxy_url, headers=requests_headers)
+            with open(proxies_file_path, "wb") as wf:
+                wf.write(res.content)
+        else:
+            print(f"√ Proxies HTML Existed: {proxies_html_path}")
+
+        return proxies_html_path
+
+    def run(self):
+        html_path = self.download_proxies_html()
+        with open(html_path, "r", encoding="utf-8") as rf:
+            html_str = rf.read()
+        extractor = ProxyRowExtractor()
+        extractor.extract(html_str)
 
 
 if __name__ == "__main__":
-    scanner = ProxyScanner(scan_proxy="http://localhost:11111")
+    scanner = ProxyScanner()
     scanner.run()
