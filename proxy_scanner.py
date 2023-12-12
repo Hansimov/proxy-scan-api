@@ -1,7 +1,6 @@
 import cssutils
-import requests
 from pathlib import Path
-from proxies import ProxyDownloader, ProxyRowExtractor
+from proxies import ProxyDownloader, ProxyRowExtractor, ProxyBenchmarker
 
 
 class ProxyScanner:
@@ -30,7 +29,16 @@ class ProxyScanner:
         with open(html_path, "r", encoding="utf-8") as rf:
             html_str = rf.read()
         extractor = ProxyRowExtractor()
-        extractor.extract(html_str)
+        proxy_dicts = extractor.extract(html_str)
+        benchmarker = ProxyBenchmarker()
+        for item in proxy_dicts:
+            ip = item["ip"]
+            port = item["port"]
+            stability = item["stability"]
+            latency = item["latency"]
+            http_proxy = f"http://{ip}:{port}"
+            print(f"{ip}:{port}\n" f"  - {stability} ({latency})")
+            benchmarker.run(http_proxy)
 
 
 if __name__ == "__main__":
