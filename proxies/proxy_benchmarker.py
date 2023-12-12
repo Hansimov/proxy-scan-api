@@ -7,6 +7,8 @@ class ProxyBenchmarker:
     def __init__(self):
         self.conversation_create_url = "https://www.bing.com/turing/conversation/create"
         self.construct_create_headers()
+        self.total_count = 0
+        self.success_count = 0
 
     def construct_create_headers(self):
         self.create_headers = {
@@ -19,6 +21,7 @@ class ProxyBenchmarker:
 
     def benchmark_requests(self, proxy=None):
         self.construct_proxies(proxy)
+        self.total_count += 1
         try:
             res = requests.get(
                 self.conversation_create_url,
@@ -32,6 +35,7 @@ class ProxyBenchmarker:
 
         try:
             logger.success(res.json())
+            self.success_count += 1
         except:
             logger.err(f"[{res.status_code}]")
             return False
