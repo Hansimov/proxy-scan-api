@@ -1,6 +1,7 @@
 import os
 import requests
 import zipfile
+from DrissionPage.easy_set import set_paths
 from pathlib import Path
 
 
@@ -33,6 +34,15 @@ class ChromedriverDownloader:
         with zipfile.ZipFile(self.output_path, "r") as rf:
             rf.extractall(self.unzip_path)
 
+    def chmod_executable(self):
+        os.chmod(self.chromedriver_executable_path, 666)
+
+    def add_to_path(self):
+        set_paths(
+            browser_path=self.chromedriver_executable_path,
+            local_port=9555,
+        )
+
     def remove_files(self):
         files_to_remove = ["LICENSE.chromedriver"]
         for file in files_to_remove:
@@ -44,6 +54,8 @@ class ChromedriverDownloader:
     def run(self):
         self.download()
         self.unzip()
+        self.chmod_executable()
+        self.add_to_path()
         self.remove_files()
 
 

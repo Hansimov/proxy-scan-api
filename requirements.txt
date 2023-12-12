@@ -1,4 +1,5 @@
 cssutils
 beautifulsoup4
+DrissionPage
 js2py
 requests
