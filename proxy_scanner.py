@@ -1,7 +1,6 @@
 import cssutils
-from pathlib import Path
 import requests
-
+from pathlib import Path
 from proxies import ProxyDownloader, ProxyRowExtractor
 
 

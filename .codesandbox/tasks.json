@@ -4,6 +4,10 @@
     {
       "name": "Installing Dependencies",
       "command": "pip install -r requirements"
+    },
+    {
+      "name": "install ubuntu packages",
+      "command": "apt install nodejs npm"
     }
   ],
 

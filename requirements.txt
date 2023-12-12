@@ -1,5 +1,7 @@
 cssutils
 beautifulsoup4
 DrissionPage
-js2py
+fastapi
+pythonmonkey
 requests
+uvicorn
