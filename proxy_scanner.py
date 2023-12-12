@@ -4,6 +4,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from pprint import pprint
+from proxies import ProxyDownloader
 
 
 class ProxyRowExtractor:
@@ -70,19 +71,9 @@ class ProxyScanner:
 
     def download_proxies_html(self, overwrite=False):
         proxy_url = self.proxy_server_list_urls[-1]
-        proxies_html_path = Path("proxies.html")
-
-        if not proxies_html_path.exists() or overwrite:
-            requests_headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
-            }
-            res = requests.get(proxy_url, headers=requests_headers)
-            with open(proxies_file_path, "wb") as wf:
-                wf.write(res.content)
-        else:
-            print(f"√ Proxies HTML Existed: {proxies_html_path}")
-
-        return proxies_html_path
+        downloader = ProxyDownloader()
+        html_path = downloader.download(proxy_url)
+        return html_path
 
     def run(self):
         html_path = self.download_proxies_html()
