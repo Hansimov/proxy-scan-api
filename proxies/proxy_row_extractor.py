@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from pprint import pprint
 
 
-
 class ProxyRowExtractor:
     def __init__(self):
         self.keys = [
@@ -31,7 +30,7 @@ class ProxyRowExtractor:
                 cell_text = re.sub(r"\s+", " ", cell.text.strip())
                 if key == "ip":
                     masked_script = cell.find("script").text
-                    js_codes = re.sub("document.write", "console.log", masked_script)
+                    js_codes = re.sub("document.write", "", masked_script)
                     ip = pm.eval(js_codes)
                     row_dict["ip"] = ip
                 elif key == "bandwidth_and_latency":
@@ -55,6 +54,10 @@ class ProxyRowExtractor:
                     row_dict[key] = cell_text
             if row_dict:
                 # pprint(row_dict)
+                print(
+                    f"{row_dict['ip']}:{row_dict['port']}\n"
+                    f"  - {row_dict['stability']} ({row_dict['latency']})"
+                )
                 self.row_dicts.append(row_dict)
         # pprint(row_dicts)
         return self.row_dicts
