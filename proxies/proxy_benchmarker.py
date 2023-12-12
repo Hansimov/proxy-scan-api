@@ -29,7 +29,7 @@ class ProxyBenchmarker:
                 self.conversation_create_url,
                 headers=self.create_headers,
                 proxies=self.requests_proxies,
-                timeout=15,
+                timeout=10,
             )
         except:
             logger.err(f"× Not Connected: {proxy}")

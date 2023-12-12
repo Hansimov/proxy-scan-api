@@ -12,7 +12,12 @@ class ProxyScanner:
     def init_proxy_servers(self):
         # https://www.proxynova.com/proxy-server-list
         self.proxy_server_list_url_base = "https://www.proxynova.com/proxy-server-list"
-        countries = ["ar", "br", "co", "de", "id", "in", "mx", "sg", "us"]
+        countries = (
+            ["al", "ar", "bd", "br", "co", "cz", "do"]
+            + ["ec", "eg", "gt", "id", "in", "kz", "ly", "mx", "my"]
+            + ["pe", "ph", "pk", "py", "th", "us", "ve", "vn"]
+        )
+
         self.proxy_server_list_urls = [
             f"{self.proxy_server_list_url_base}/country-{country}"
             for country in countries
