@@ -1,5 +1,6 @@
 import requests
 from pathlib import Path
+from utils.logger import logger
 
 
 class ProxyDownloader:
@@ -19,11 +20,11 @@ class ProxyDownloader:
 
         if not output_path.exists() or overwrite:
             res = requests.get(url, headers=self.requests_headers)
-            print(f"√ Dump Proxies HTML to: {output_path}")
+            logger.note(f"√ Dump Proxies HTML to: {output_path}")
             with open(output_path, "wb") as wf:
                 wf.write(res.content)
         else:
-            print(f"√ Proxies HTML Existed: {output_path}")
+            logger.note(f"√ Proxies HTML Existed: {output_path}")
 
         self.url = url
         self.output_path = output_path

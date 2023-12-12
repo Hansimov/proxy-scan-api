@@ -5,6 +5,7 @@ import re
 
 from bs4 import BeautifulSoup
 from pprint import pprint
+from utils.logger import logger
 
 
 class ProxyRowExtractor:
@@ -53,11 +54,6 @@ class ProxyRowExtractor:
                 else:
                     row_dict[key] = cell_text
             if row_dict:
-                # pprint(row_dict)
-                print(
-                    f"{row_dict['ip']}:{row_dict['port']}\n"
-                    f"  - {row_dict['stability']} ({row_dict['latency']})"
-                )
                 self.row_dicts.append(row_dict)
-        # pprint(row_dicts)
+        logger.note(f"+ {len(self.row_dicts)} proxies found.")
         return self.row_dicts

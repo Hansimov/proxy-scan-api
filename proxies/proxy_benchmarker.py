@@ -53,8 +53,8 @@ class ProxyBenchmarker:
         stability = proxy_dict["stability"]
         latency = proxy_dict["latency"]
         http_proxy = f"http://{ip}:{port}"
-        logger.mesg(f"> Testing: ", end="")
-        logger.line(http_proxy)
+        # logger.mesg(f"> Testing: ", end="")
+        # logger.line(http_proxy)
         return self.eval_requests(http_proxy)
 
     def batch_tests(self, proxy_dicts):
@@ -69,7 +69,9 @@ class ProxyBenchmarker:
 
         logger.success(self.success_count, end="")
         logger.note(f"/{self.total_count}")
-        logger.success(self.success_proxies)
+
+        if self.success_proxies:
+            logger.success(self.success_proxies)
 
 
 if __name__ == "__main__":
