@@ -19,7 +19,7 @@ class ProxyBenchmarker:
         self.proxy = proxy
         self.requests_proxies = {"http": proxy, "https": proxy}
 
-    def benchmark_requests(self, proxy=None):
+    def eval_requests(self, proxy=None):
         self.construct_proxies(proxy)
         self.total_count += 1
         try:
@@ -42,12 +42,25 @@ class ProxyBenchmarker:
 
         return True
 
-    def run(self, proxy=None):
-        logger.mesg(f"Benchmarking: [{proxy}]")
-        self.benchmark_requests(proxy)
+    def batch_tests(self, proxy_dicts):
+        for idx, item in enumerate(proxy_dicts):
+            ip = item["ip"]
+            port = item["port"]
+            stability = item["stability"]
+            latency = item["latency"]
+            http_proxy = f"http://{ip}:{port}"
+            logger.line(
+                f"({idx+1}/{(len(proxy_dicts))}) {ip}:{port}\n"
+                f"  - {stability} ({latency})"
+            )
+            logger.mesg(f"Benchmarking: [{http_proxy}]")
+            self.eval_requests(http_proxy)
+
+        logger.success(self.success_count, end="")
+        logger.note(f"/{self.total_count}")
 
 
 if __name__ == "__main__":
     benchmarker = ProxyBenchmarker()
     proxy = "http://" + "162.248.225.214:80"
-    benchmarker.run(proxy)
+    benchmarker.eval_requests(proxy)

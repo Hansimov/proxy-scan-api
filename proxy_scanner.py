@@ -20,32 +20,19 @@ class ProxyScanner:
         ]
 
     def download_proxies_html(self, overwrite=False):
-        proxy_url = self.proxy_server_list_url_base + "ar"
+        proxy_url = self.proxy_server_list_url_base + "us"
         downloader = ProxyDownloader()
         html_path = downloader.download(proxy_url, overwrite=overwrite)
-        return html_path
-
-    def run(self):
-        html_path = self.download_proxies_html(overwrite=True)
         with open(html_path, "r", encoding="utf-8") as rf:
             html_str = rf.read()
+        return html_path, html_str
+
+    def run(self):
+        html_path, html_str = self.download_proxies_html(overwrite=True)
         extractor = ProxyRowExtractor()
         proxy_dicts = extractor.extract(html_str)
         benchmarker = ProxyBenchmarker()
-
-        for idx, item in enumerate(proxy_dicts):
-            ip = item["ip"]
-            port = item["port"]
-            stability = item["stability"]
-            latency = item["latency"]
-            http_proxy = f"http://{ip}:{port}"
-            logger.line(
-                f"({idx+1}/{(len(proxy_dicts))}) {ip}:{port}\n"
-                f"  - {stability} ({latency})"
-            )
-            benchmarker.run(http_proxy)
-        logger.success(benchmarker.success_count, end="")
-        logger.note(f"/{benchmarker.total_count}")
+        benchmarker.batch_tests(proxy_dicts)
 
 
 if __name__ == "__main__":
