@@ -11,28 +11,27 @@ class ProxyScanner:
 
     def init_proxy_servers(self):
         # https://www.proxynova.com/proxy-server-list
-        self.proxy_server_list_url_base = (
-            "https://www.proxynova.com/proxy-server-list/country-"
-        )
+        self.proxy_server_list_url_base = "https://www.proxynova.com/proxy-server-list"
         countries = ["ar", "br", "co", "de", "id", "in", "mx", "sg", "us"]
         self.proxy_server_list_urls = [
-            f"{self.proxy_server_list_url_base}{country}" for country in countries
+            f"{self.proxy_server_list_url_base}/country-{country}"
+            for country in countries
         ]
 
-    def download_proxies_html(self, overwrite=False):
-        proxy_url = self.proxy_server_list_url_base + "us"
+    def download_proxies_html(self, url, overwrite=False):
         downloader = ProxyDownloader()
-        html_path = downloader.download(proxy_url, overwrite=overwrite)
+        html_path = downloader.download(url, overwrite=overwrite)
         with open(html_path, "r", encoding="utf-8") as rf:
             html_str = rf.read()
         return html_path, html_str
 
     def run(self):
-        html_path, html_str = self.download_proxies_html(overwrite=True)
-        extractor = ProxyRowExtractor()
-        proxy_dicts = extractor.extract(html_str)
-        benchmarker = ProxyBenchmarker()
-        benchmarker.batch_tests(proxy_dicts)
+        for url in self.proxy_server_list_urls:
+            html_path, html_str = self.download_proxies_html(url, overwrite=True)
+            extractor = ProxyRowExtractor()
+            proxy_dicts = extractor.extract(html_str)
+            benchmarker = ProxyBenchmarker()
+            benchmarker.batch_tests(proxy_dicts)
 
 
 if __name__ == "__main__":
