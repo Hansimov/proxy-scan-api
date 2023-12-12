@@ -1,3 +1,4 @@
+import concurrent.futures
 import requests
 from pprint import pprint
 from utils.logger import logger, Runtimer
@@ -9,6 +10,7 @@ class ProxyBenchmarker:
         self.construct_create_headers()
         self.total_count = 0
         self.success_count = 0
+        self.success_proxies = []
 
     def construct_create_headers(self):
         self.create_headers = {
@@ -30,34 +32,44 @@ class ProxyBenchmarker:
                 timeout=15,
             )
         except:
-            logger.err("No Connected!")
+            logger.err(f"× Not Connected: {proxy}")
             return False
 
         try:
-            logger.success(res.json())
+            json_data = res.json()
+            logger.success(f"√ OK: {proxy}")
+            logger.success(json_data)
             self.success_count += 1
+            self.success_proxies.append(proxy)
         except:
-            logger.err(f"[{res.status_code}]")
+            logger.err(f"× [{res.status_code}] {proxy}")
             return False
 
         return True
 
+    def sequential_test(self, proxy_dict):
+        ip = proxy_dict["ip"]
+        port = proxy_dict["port"]
+        stability = proxy_dict["stability"]
+        latency = proxy_dict["latency"]
+        http_proxy = f"http://{ip}:{port}"
+        logger.mesg(f"> Testing: ", end="")
+        logger.line(http_proxy)
+        return self.eval_requests(http_proxy)
+
     def batch_tests(self, proxy_dicts):
-        for idx, item in enumerate(proxy_dicts):
-            ip = item["ip"]
-            port = item["port"]
-            stability = item["stability"]
-            latency = item["latency"]
-            http_proxy = f"http://{ip}:{port}"
-            logger.line(
-                f"({idx+1}/{(len(proxy_dicts))}) {ip}:{port}\n"
-                f"  - {stability} ({latency})"
-            )
-            logger.mesg(f"Benchmarking: [{http_proxy}]")
-            self.eval_requests(http_proxy)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(self.sequential_test, proxy_dict)
+                for proxy_dict in proxy_dicts
+            ]
+
+        for idx, future in enumerate(concurrent.futures.as_completed(futures)):
+            result = future.result()
 
         logger.success(self.success_count, end="")
         logger.note(f"/{self.total_count}")
+        logger.success(self.success_proxies)
 
 
 if __name__ == "__main__":
