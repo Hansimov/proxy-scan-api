@@ -1,3 +1,4 @@
 cssutils
 beautifulsoup4
+js2py
 requests
