@@ -13,10 +13,5 @@
 
   // These tasks can be run from CodeSandbox. Running one will open a log in the app.
   "tasks": {
-    "run-redis": {
-      "name": "Run Redis Service",
-      "command": "redis-server --daemonize yes",
-      "runAtStart": true,
-    }
   }
 }
