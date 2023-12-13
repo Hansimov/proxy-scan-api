@@ -2,15 +2,21 @@
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
     {
-      "name": "Installing Dependencies",
-      "command": "pip install -r requirements"
+      "name": "Install Python Dependencies",
+      "command": "pip install -r requirements.txt"
     },
     {
-      "name": "install ubuntu packages",
-      "command": "apt install nodejs npm"
+      "name": "Install Ubuntu Packages",
+      "command": "cat requirements_apt.txt | xargs -L 1 apt install -y "
     }
   ],
 
   // These tasks can be run from CodeSandbox. Running one will open a log in the app.
-  "tasks": {}
+  "tasks": {
+    "run-redis": {
+      "name": "Run Redis Service",
+      "command": "redis-server --daemonize yes",
+      "runAtStart": true,
+    }
+  }
 }

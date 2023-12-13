@@ -3,6 +3,7 @@ beautifulsoup4
 DrissionPage
 fastapi
 pythonmonkey
+redis
 requests
 termcolor
 uvicorn
