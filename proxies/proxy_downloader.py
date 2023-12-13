@@ -8,7 +8,8 @@ class ProxyDownloader:
         self.requests_headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
         }
-        self.output_path_root = Path(__file__).parents[1] / "data"
+        self.output_path_root = Path(__file__).parents[1] / "files"
+        self.output_path_root.mkdir(parents=True, exist_ok=True)
 
     def output_path_namer(self, url):
         output_path = (self.output_path_root / url.split("/")[-1]).with_suffix(".html")

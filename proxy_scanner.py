@@ -1,7 +1,7 @@
 import cssutils
 from pathlib import Path
 from proxies import ProxyDownloader, ProxyRowExtractor, ProxyBenchmarker
-from utils.logger import logger
+from utils.logger import logger, Runtimer
 
 
 class ProxyScanner:
@@ -32,11 +32,12 @@ class ProxyScanner:
 
     def run(self):
         for url in self.proxy_server_list_urls:
-            html_path, html_str = self.download_proxies_html(url, overwrite=True)
-            extractor = ProxyRowExtractor()
-            proxy_dicts = extractor.extract(html_str)
-            benchmarker = ProxyBenchmarker()
-            benchmarker.batch_tests(proxy_dicts)
+            with Runtimer():
+                html_path, html_str = self.download_proxies_html(url, overwrite=True)
+                extractor = ProxyRowExtractor()
+                proxy_dicts = extractor.extract(html_str)
+                benchmarker = ProxyBenchmarker()
+                benchmarker.batch_tests(proxy_dicts)
 
 
 if __name__ == "__main__":
