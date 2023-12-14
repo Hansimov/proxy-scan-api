@@ -2,16 +2,15 @@
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
     {
-      "name": "Install Python Dependencies",
-      "command": "pip install -r requirements.txt"
-    },
-    {
       "name": "Install Ubuntu Packages",
       "command": "cat requirements_apt.txt | xargs -L 1 apt install -y "
+    },
+    {
+      "name": "Install Python Dependencies",
+      "command": "pip install -r requirements.txt"
     }
   ],
 
   // These tasks can be run from CodeSandbox. Running one will open a log in the app.
-  "tasks": {
-  }
+  "tasks": {}
 }

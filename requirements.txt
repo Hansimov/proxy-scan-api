@@ -1,6 +1,5 @@
 cssutils
 beautifulsoup4
-DrissionPage
 fastapi
 pandas
 pythonmonkey
