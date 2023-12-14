@@ -9,6 +9,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import Optional
 from databases import ProxyDatabase
+from utils.logger import logger
 
 
 class ProxyDatabaseAPIApp:
@@ -19,10 +20,9 @@ class ProxyDatabaseAPIApp:
             swagger_ui_parameters={"defaultModelsExpandDepth": -1},
             version="1.0",
         )
+        self.db = ProxyDatabase()
         self.setup_host_port()
         self.setup_routes()
-        self.db = ProxyDatabase()
-        self.proxy_db_path = Path(__file__).parent / "proxies_db.pkl"
 
     def setup_host_port(self):
         self.api_configs_json = Path(__file__).parent / "api_configs.json"
@@ -47,11 +47,21 @@ class ProxyDatabaseAPIApp:
             add_datetime=add_datetime,
         )
 
+        return {"status": "success"}
+
     def setup_routes(self):
+        self.app.add_event_handler("startup", self.db.load)
+        self.app.add_event_handler("shutdown", self.db.dump)
+
         self.app.post(
             "/add",
             summary="Add proxy to database",
         )(self.add)
+
+        self.app.post(
+            "/clear",
+            summary="Clear proxy database",
+        )(self.db.clear)
 
 
 api = ProxyDatabaseAPIApp()

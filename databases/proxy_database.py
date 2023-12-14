@@ -1,12 +1,12 @@
 import pandas as pd
 from pathlib import Path
+from utils.logger import logger
 
 
 class ProxyDatabase:
     def __init__(self):
         self.proxy_db_path = Path(__file__).parent / "proxies_db.pkl"
         self.setup_default_proxy_df()
-        self.load()
 
     def setup_default_proxy_df(self):
         self.df_dtypes = {
@@ -26,14 +26,23 @@ class ProxyDatabase:
 
     def load(self):
         if self.proxy_db_path.exists():
+            logger.success(f"> Load proxy database from: {self.proxy_db_path}")
             self.proxy_df = pd.read_pickle(self.proxy_db_path)
+            logger.note(self.proxy_df.head())
         else:
+            logger.success(f"> Initialize proxy database")
             self.proxy_df = self.default_proxy_df
         return self.proxy_df
 
     def dump(self):
+        logger.success(f"> Dump proxy database to: {self.proxy_db_path}")
+        logger.note(self.proxy_df.head())
         self.proxy_db_path.parent.mkdir(parents=True, exist_ok=True)
         self.proxy_df.to_pickle(self.proxy_db_path)
+
+    def clear(self):
+        logger.note(f"> Clear proxy database")
+        self.proxy_df = self.default_proxy_df
 
     def add(
         self,
@@ -57,7 +66,7 @@ class ProxyDatabase:
             "add_datetime": add_datetime,
         }
         self.proxy_df.loc[proxy] = proxy_dict
-        self.display()
+        logger.note(self.proxy_df.loc[[proxy]])
 
     def display(self):
-        print(self.proxy_df)
+        logger.file(self.proxy_df)
