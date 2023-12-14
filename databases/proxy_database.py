@@ -95,12 +95,14 @@ class ProxyDatabase:
         sec_access_token: str,
         client_id: str,
         conversation_id: str,
+        add_datetime: str = None,
     ):
         session_dict = {
             "conversation_style": conversation_style,
             "sec_access_token": sec_access_token,
             "client_id": client_id,
             "conversation_id": conversation_id,
+            "add_datetime": add_datetime,
         }
         self.session_df.loc[sec_access_token] = session_dict
         logger.note(self.session_df.loc[[sec_access_token]])

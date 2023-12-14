@@ -60,6 +60,7 @@ class ProxyDatabaseAPIApp:
             sec_access_token=sec_access_token,
             client_id=client_id,
             conversation_id=conversation_id,
+            add_datetime=add_datetime,
         )
         return {"status": "success"}
 
