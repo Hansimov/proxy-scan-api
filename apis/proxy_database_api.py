@@ -8,9 +8,11 @@ from fastapi import FastAPI, Body
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import Optional
+
+from apis import get_host_port
 from databases import ProxyDatabase
 from utils.logger import logger
-from apis import get_host_port
+from proxies import ProxyScanner
 
 
 class ProxyDatabaseAPIApp:
@@ -51,6 +53,7 @@ class ProxyDatabaseAPIApp:
         sec_access_token: Optional[str] = Body(...),
         client_id: Optional[str] = Body(...),
         conversation_id: Optional[str] = Body(...),
+        add_datetime: Optional[str] = Body(None),
     ):
         self.db.add_session(
             conversation_style=conversation_style,

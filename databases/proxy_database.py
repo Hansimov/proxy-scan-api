@@ -30,6 +30,7 @@ class ProxyDatabase:
             "sec_access_token": "str",
             "client_id": "str",
             "conversation_id": "str",
+            "add_datetime": "str",
         }
         self.session_df_index = ["sec_access_token"]
         self.defautl_session_df = pd.DataFrame(
