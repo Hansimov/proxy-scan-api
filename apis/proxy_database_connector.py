@@ -3,18 +3,15 @@ import requests
 
 from pathlib import Path
 from utils.logger import logger
+from apis import get_host_port
 
 
-class ProxyScheduler:
+class ProxyDatabaseConnector:
     def __init__(self):
-        self.get_databse_host_port()
+        self.get_database_host_port()
 
-    def get_databse_host_port(self):
-        self.api_configs_json = Path(__file__).parents[1] / "apis" / "api_configs.json"
-        with open(self.api_configs_json, "r") as rf:
-            self.db_api_configs = json.load(rf)["proxy-database"]
-        self.db_api_host = self.db_api_configs["host"]
-        self.db_api_port = self.db_api_configs["port"]
+    def get_database_host_port(self):
+        self.db_api_host, self.db_api_port = get_host_port("proxy-database")
         self.db_api_url = f"http://{self.db_api_host}:{self.db_api_port}"
 
     def random_proxy(self):
