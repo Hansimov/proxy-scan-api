@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from databases import ProxyDatabase
 from utils.logger import logger
+from apis import get_host_port
 
 
 class ProxyDatabaseAPIApp:
@@ -25,11 +26,7 @@ class ProxyDatabaseAPIApp:
         self.setup_routes()
 
     def setup_host_port(self):
-        self.api_configs_json = Path(__file__).parent / "api_configs.json"
-        with open(self.api_configs_json, "r") as rf:
-            self.api_configs = json.load(rf)["proxy-database"]
-        self.host = self.api_configs["host"]
-        self.port = self.api_configs["port"]
+        self.host, self.port = get_host_port("proxy-database")
 
     def add_proxy(
         self,
