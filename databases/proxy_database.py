@@ -6,10 +6,11 @@ from utils.logger import logger
 class ProxyDatabase:
     def __init__(self):
         self.proxy_db_path = Path(__file__).parent / "proxies_db.pkl"
-        self.setup_default_proxy_df()
+        self.session_db_path = Path(__file__).parent / "sessions_db.pkl"
+        self.setup_default_df()
 
-    def setup_default_proxy_df(self):
-        self.df_dtypes = {
+    def setup_default_df(self):
+        self.proxy_df_dtypes = {
             "proxy": "str",
             "ip": "str",
             "port": "int",
@@ -19,10 +20,21 @@ class ProxyDatabase:
             "check_datetime": "str",
             "add_datetime": "str",
         }
-        self.df_index = ["proxy"]
+        self.proxy_df_index = ["proxy"]
         self.default_proxy_df = pd.DataFrame(
-            columns=self.df_dtypes.keys(),
-        ).set_index(self.df_index)
+            columns=self.proxy_df_dtypes.keys(),
+        ).set_index(self.proxy_df_index)
+
+        self.session_df_dtypes = {
+            "conversation_style": "str",
+            "sec_access_token": "str",
+            "client_id": "str",
+            "conversation_id": "str",
+        }
+        self.session_df_index = ["sec_access_token"]
+        self.defautl_session_df = pd.DataFrame(
+            columns=self.session_df_dtypes.keys(),
+        ).set_index(self.session_df_index)
 
     def load(self):
         if self.proxy_db_path.exists():
@@ -32,7 +44,14 @@ class ProxyDatabase:
         else:
             logger.success(f"> Initialize proxy database")
             self.proxy_df = self.default_proxy_df
-        return self.proxy_df
+
+        if self.session_db_path.exists():
+            logger.success(f"> Load session database from: {self.session_db_path}")
+            self.session_df = pd.read_pickle(self.session_db_path)
+            logger.note(self.session_df.head())
+        else:
+            logger.success(f"> Initialize session database")
+            self.session_df = self.defautl_session_df
 
     def dump(self):
         logger.success(f"> Dump proxy database to: {self.proxy_db_path}")
@@ -40,11 +59,12 @@ class ProxyDatabase:
         self.proxy_db_path.parent.mkdir(parents=True, exist_ok=True)
         self.proxy_df.to_pickle(self.proxy_db_path)
 
-    def clear(self):
-        logger.note(f"> Clear proxy database")
-        self.proxy_df = self.default_proxy_df
+        logger.success(f"> Dump session database to: {self.session_db_path}")
+        logger.note(self.session_df.head())
+        self.session_db_path.parent.mkdir(parents=True, exist_ok=True)
+        self.session_df.to_pickle(self.session_db_path)
 
-    def add(
+    def add_proxy(
         self,
         proxy: str,
         usable: bool = False,
@@ -68,5 +88,30 @@ class ProxyDatabase:
         self.proxy_df.loc[proxy] = proxy_dict
         logger.note(self.proxy_df.loc[[proxy]])
 
+    def add_session(
+        self,
+        conversation_style: str,
+        sec_access_token: str,
+        client_id: str,
+        conversation_id: str,
+    ):
+        session_dict = {
+            "conversation_style": conversation_style,
+            "sec_access_token": sec_access_token,
+            "client_id": client_id,
+            "conversation_id": conversation_id,
+        }
+        self.session_df.loc[sec_access_token] = session_dict
+        logger.note(self.session_df.loc[[sec_access_token]])
+
+    def clear_proxies(self):
+        logger.note(f"> Clear proxy database")
+        self.proxy_df = self.default_proxy_df
+
+    def clear_sessions(self):
+        logger.note(f"> Clear session database")
+        self.session_df = self.defautl_session_df
+
     def display(self):
         logger.file(self.proxy_df)
+        logger.file(self.session_df)

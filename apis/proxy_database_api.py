@@ -31,7 +31,7 @@ class ProxyDatabaseAPIApp:
         self.host = self.api_configs["host"]
         self.port = self.api_configs["port"]
 
-    def add(
+    def add_proxy(
         self,
         proxy: Optional[str] = Body(...),
         usable: Optional[bool] = Body(False),
@@ -39,14 +39,28 @@ class ProxyDatabaseAPIApp:
         check_datetime: Optional[str] = Body(None),
         add_datetime: Optional[str] = Body(None),
     ):
-        self.db.add(
+        self.db.add_proxy(
             proxy=proxy,
             usable=usable,
             latency=latency,
             check_datetime=check_datetime,
             add_datetime=add_datetime,
         )
+        return {"status": "success"}
 
+    def add_session(
+        self,
+        conversation_style: Optional[str] = Body(...),
+        sec_access_token: Optional[str] = Body(...),
+        client_id: Optional[str] = Body(...),
+        conversation_id: Optional[str] = Body(...),
+    ):
+        self.db.add_session(
+            conversation_style=conversation_style,
+            sec_access_token=sec_access_token,
+            client_id=client_id,
+            conversation_id=conversation_id,
+        )
         return {"status": "success"}
 
     def setup_routes(self):
@@ -54,18 +68,28 @@ class ProxyDatabaseAPIApp:
         self.app.add_event_handler("shutdown", self.db.dump)
 
         self.app.post(
-            "/add",
+            "/add_proxy",
             summary="Add proxy to database",
-        )(self.add)
+        )(self.add_proxy)
 
         self.app.post(
-            "/clear",
+            "/add_session",
+            summary="Add session to database",
+        )(self.add_session)
+
+        self.app.post(
+            "/clear_proxies",
             summary="Clear proxy database",
-        )(self.db.clear)
+        )(self.db.clear_proxies)
+
+        self.app.post(
+            "/clear_sessions",
+            summary="Clear session database",
+        )(self.db.clear_sessions)
 
 
 api = ProxyDatabaseAPIApp()
 app = api.app
 
 if __name__ == "__main__":
-    uvicorn.run("__main__:app", host=api.host, port=api.port, reload=True)
+    uvicorn.run("__main__:app", host=api.host, port=api.port, reload=False)
