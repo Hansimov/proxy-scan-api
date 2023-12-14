@@ -187,7 +187,7 @@ def shell_cmd(cmd, getoutput=False, showcmd=True, env=None):
         logger.info(colored(f"\n$ [{os.getcwd()}]", "light_blue"))
         logger.info(colored(f"  $ {cmd}\n", "light_cyan"))
     if getoutput:
-        output = subprocess.getoutput(cmd, env=env)
+        output = subprocess.getoutput(cmd)
         return output
     else:
         subprocess.run(cmd, shell=True, env=env)

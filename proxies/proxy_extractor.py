@@ -1,11 +1,10 @@
 import cssutils
 import base64
-import pythonmonkey as pm
 import re
 
 from bs4 import BeautifulSoup
 from pprint import pprint
-from utils.logger import logger
+from utils.logger import logger, shell_cmd
 
 
 class ProxyExtractor:
@@ -21,6 +20,16 @@ class ProxyExtractor:
         ]
         self.row_dicts = []
 
+    def eval_js_codes(self, js_codes):
+        js_codes = re.sub("document.write", "console.log", js_codes)
+        js_codes_to_eval = js_codes.replace('"', '\\"')
+        js_codes_to_eval_in_python = (
+            f"from pythonmonkey import eval; eval('{js_codes_to_eval}')"
+        )
+        pm_cmd = f'python -c "{js_codes_to_eval_in_python}"'
+        output = shell_cmd(pm_cmd, getoutput=True, showcmd=False)
+        return output
+
     def extract(self, html_str):
         soup = BeautifulSoup(html_str, "html.parser")
         rows = soup.find("table").find("tbody").find_all("tr")
@@ -31,8 +40,7 @@ class ProxyExtractor:
                 cell_text = re.sub(r"\s+", " ", cell.text.strip())
                 if key == "ip":
                     masked_script = cell.find("script").text
-                    js_codes = re.sub("document.write", "", masked_script)
-                    ip = pm.eval(js_codes)
+                    ip = self.eval_js_codes(masked_script)
                     row_dict["ip"] = ip
                 elif key == "bandwidth_and_latency":
                     progress_bar = cell.find("div", class_="progress-bar-inner")
