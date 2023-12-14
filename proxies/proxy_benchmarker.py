@@ -2,6 +2,7 @@ import concurrent.futures
 import requests
 from pprint import pprint
 from utils.logger import logger, Runtimer
+from proxies import ProxyScheduler
 
 
 class ProxyBenchmarker:
@@ -11,6 +12,7 @@ class ProxyBenchmarker:
         self.total_count = 0
         self.success_count = 0
         self.success_proxies = []
+        self.proxy_scheduler = ProxyScheduler()
 
     def construct_create_headers(self):
         self.create_headers = {
@@ -52,10 +54,12 @@ class ProxyBenchmarker:
         port = proxy_dict["port"]
         stability = proxy_dict["stability"]
         latency = proxy_dict["latency"]
-        http_proxy = f"http://{ip}:{port}"
+        proxy = f"{ip}:{port}"
+        http_proxy = f"http://{proxy}"
         # logger.mesg(f"> Testing: ", end="")
         # logger.line(http_proxy)
-        return self.eval_requests(http_proxy)
+        usable = self.eval_requests(http_proxy)
+        self.proxy_scheduler.add_proxy(proxy=proxy, usable=usable)
 
     def batch_tests(self, proxy_dicts):
         with concurrent.futures.ThreadPoolExecutor() as executor:

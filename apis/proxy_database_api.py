@@ -11,8 +11,8 @@ from typing import Optional
 
 from apis import get_host_port
 from databases import ProxyDatabase
-from utils.logger import logger
 from proxies import ProxyScanner
+from utils.logger import logger
 
 
 class ProxyDatabaseAPIApp:
@@ -86,6 +86,11 @@ class ProxyDatabaseAPIApp:
             "/clear_sessions",
             summary="Clear session database",
         )(self.db.clear_sessions)
+
+        self.app.post(
+            "/display",
+            summary="Display database",
+        )(self.db.display)
 
 
 api = ProxyDatabaseAPIApp()
