@@ -53,6 +53,7 @@ class ProxyScheduler:
         sec_access_token: str,
         client_id: str,
         conversation_id: str,
+        add_datetime: str = None,
     ):
         url = f"{self.db_api_url}/add_session"
         json_data = {
@@ -60,6 +61,7 @@ class ProxyScheduler:
             "sec_access_token": sec_access_token,
             "client_id": client_id,
             "conversation_id": conversation_id,
+            "add_datetime": add_datetime,
         }
         requests.post(url, json=json_data, proxies=None)
 
