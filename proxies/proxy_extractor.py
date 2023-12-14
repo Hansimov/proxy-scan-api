@@ -8,7 +8,7 @@ from pprint import pprint
 from utils.logger import logger
 
 
-class ProxyRowExtractor:
+class ProxyExtractor:
     def __init__(self):
         self.keys = [
             "ip",
